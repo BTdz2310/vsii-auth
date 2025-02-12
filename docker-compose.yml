@@ -1,0 +1,35 @@
+services:
+  postgis-auth:
+    image: postgres:latest
+    container_name: auth-postgresql
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5433:5432"
+    # expose:
+    #   - "5432"
+    volumes:
+      - auth_service:/var/lib/postgresql/data
+    restart: "no"
+    networks:
+      - kafka_network
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgis-auth
+    ports:
+      - "3000:3000"
+    networks:
+      - kafka_network
+
+volumes:
+  auth_service:
+
+networks:
+  kafka_network:
+    external: true
