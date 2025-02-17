@@ -1,5 +1,8 @@
 import {
+  ArrayMinSize,
+  IsArray,
   IsString,
+  IsUUID,
   Matches,
   MaxLength,
   MinLength,
@@ -18,4 +21,12 @@ export class CreateRegisterDto {
     message: 'Mật khẩu quá yếu',
   })
   password: string;
+
+  @IsArray()
+  @IsUUID(undefined, { each: true })
+  @ArrayMinSize(3, { message: 'Phải có tối thiểu 3 tag' })
+  tags: string[];
+
+  @IsString()
+  fullname: string;
 }

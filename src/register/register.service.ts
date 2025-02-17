@@ -18,8 +18,9 @@ export class RegisterService {
 
   async register(
     @Body()
-    data: Prisma.AuthCreateInput,
+    data: CreateRegisterDto,
   ) {
+    console.log(data);
     const { hashedPassword } = await this.bcryptService.hashPassword(
       data.password,
     );
@@ -27,20 +28,19 @@ export class RegisterService {
     const auth = await this.prisma.auth.create({
       data: {
         ...data,
-        password: hashedPassword,
-      },
-      omit: {
-        password: true,
+        password: {
+          create: {
+            hash: hashedPassword,
+          },
+        },
       },
     });
 
-    // this.kafkaClient.emit('auth.register', {
-    //   authId: auth.id,
-    //   fullName: fullName,
-    //   phoneNumber: phoneNumber,
-    //   email: auth.email,
-    //   username: auth.username,
-    // });
+    this.kafkaClient.emit('auth.register', {
+      authId: auth.id,
+      fullName: data.fullname,
+      tags: data.tags,
+    });
     return auth;
   }
 

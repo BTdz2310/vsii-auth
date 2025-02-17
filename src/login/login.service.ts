@@ -16,17 +16,20 @@ export class LoginService {
       where: {
         username: identifier,
       },
-      select: {
-        id: true,
-        username: true,
-        password: true,
+      include: {
+        password: {
+          select: {
+            hash: true,
+          },
+        },
       },
     });
-    const isMatch = await this.bcrypt.compare(password, auth.password);
+    const isMatch = await this.bcrypt.compare(password, auth.password.hash);
     if (!isMatch) throw new InternalServerErrorException('');
     return {
       id: auth.id,
       username: auth.username,
+      role: auth.role,
     };
   }
 }

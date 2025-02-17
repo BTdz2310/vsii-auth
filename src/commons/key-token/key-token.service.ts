@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'fs';
 import { join } from 'path';
-import { AuthResponse } from 'src/interfaces/AuthResponse.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

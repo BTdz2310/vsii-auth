@@ -1,4 +1,4 @@
-import { Controller, Inject, Post, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Post, Res, UseGuards } from '@nestjs/common';
 import { LoginService } from './login.service';
 import { LocalGuard } from 'src/guards/local.guard';
 import { AuthResponse } from 'src/interfaces/AuthResponse.interface';
@@ -10,13 +10,14 @@ import { ClientKafka } from '@nestjs/microservices';
 @Controller('login')
 export class LoginController {
   constructor(
-    @Inject('LOGIN_SERVICE') private readonly kafkaClient: ClientKafka,
+    @Inject('REGISTER_SERVICE') private readonly kafkaClient: ClientKafka,
     private readonly loginService: LoginService,
     private readonly keyTokenService: KeyTokenService,
   ) {}
 
   onModuleInit() {
     this.kafkaClient.subscribeToResponseOf('auth.getUser');
+    this.kafkaClient.subscribeToResponseOf('auth.check2');
     this.kafkaClient.connect();
   }
 
@@ -58,5 +59,12 @@ export class LoginController {
   ) {
     console.log('auth', auth);
     return this.handleAuthenticationResponse(auth, response);
+  }
+
+  @Get('check')
+  async getCheck() {
+    // return "HELLO"
+    return await this.kafkaClient.send('auth.check2', 'VN!!!').toPromise();
+    // return this.registerService.getCheck();
   }
 }

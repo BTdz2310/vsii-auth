@@ -14,23 +14,33 @@ datasource db {
 }
 
 model Auth {
-  id       String @id @default(uuid()) @map("id") @db.Uuid
-  username String @unique
-  password String
-  role     Role[] @default([USER])
+  id        String    @id @default(uuid()) @map("id") @db.Uuid
+  username  String    @unique
+  isActive  Boolean   @default(true)
+  role      Role[]    @default([USER])
+  createdAt DateTime  @default(now())
+  password  Password? @relation()
+}
+
+model Password {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  authId    String   @unique @db.Uuid
+  hash      String
+  updatedAt DateTime @updatedAt
+  auth      Auth     @relation(fields: [authId], references: [id])
 }
 
 model Permission {
   id             String           @id @default(uuid()) @map("id") @db.Uuid
-  name           String
-  shorthand      String
+  name           String           @unique
+  shorthand      String           @unique
   type           Int
   RolePermission RolePermission[]
 }
 
 model RolePermission {
   permission   Permission @relation(fields: [permissionId], references: [id])
-  permissionId String
+  permissionId String     @db.Uuid
   role         Role
 
   @@id([permissionId, role])
@@ -40,6 +50,5 @@ enum Role {
   SUPER_ADMIN
   WRITTER
   CENSOR
-  DATA_VIEWER
   USER
 }
