@@ -7,12 +7,13 @@ import { LoginService } from '../login/login.service';
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(private readonly authService: LoginService) {
-    super({ usernameField: 'identifier' } as IStrategyOptions);
+    super({ usernameField: 'username' } as IStrategyOptions);
   }
 
-  async validate(identifier: string, password: string) {
+  async validate(username: string, password: string) {
     try {
-      return await this.authService.authenticate({ identifier, password });
+      console.log('data2', username, password);
+      return await this.authService.authenticate({ username, password });
     } catch {
       throw new BadRequestException('Invalid credentials');
     }

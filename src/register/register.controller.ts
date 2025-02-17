@@ -8,14 +8,14 @@ import { KeyTokenService } from 'src/commons/key-token/key-token.service';
 @Controller('register')
 export class RegisterController {
   constructor(
-    @Inject('REGISTER_SERVICE') private readonly kafkaClient: ClientKafka,
+    @Inject('AUTH_SERVICE') private readonly kafkaClient: ClientKafka,
     private readonly registerService: RegisterService,
     private readonly keyService: KeyTokenService,
   ) {}
 
   onModuleInit() {
     this.kafkaClient.subscribeToResponseOf('auth.check');
-    this.kafkaClient.connect();
+    // this.kafkaClient.connect();
   }
 
   @Get()
@@ -28,11 +28,11 @@ export class RegisterController {
     return this.registerService.register(createRegisterDto);
   }
 
-  // @EventPattern('user.register-failed')
-  // rollBackRegister(@Payload() data: UserPayloadRollbackRegisterDto) {
-  //   console.log(data);
-  //   return this.registerService.rollBackRegister(data);
-  // }
+  @EventPattern('user.register-failed')
+  rollBackRegister(@Payload() data: UserPayloadRollbackRegisterDto) {
+    console.log(data);
+    return this.registerService.rollBackRegister(data);
+  }
 
   @Get('check')
   async getCheck() {

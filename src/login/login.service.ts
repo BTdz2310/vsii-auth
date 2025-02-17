@@ -11,17 +11,16 @@ export class LoginService {
   ) {}
 
   async authenticate(data: CreateLoginDto) {
-    const { identifier, password } = data;
+    const { username, password } = data;
     const auth = await this.prisma.auth.findFirstOrThrow({
       where: {
-        username: identifier,
+        username,
       },
-      include: {
-        password: {
-          select: {
-            hash: true,
-          },
-        },
+      select: {
+        id: true,
+        username: true,
+        password: true,
+        role: true,
       },
     });
     const isMatch = await this.bcrypt.compare(password, auth.password.hash);

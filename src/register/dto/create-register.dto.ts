@@ -22,11 +22,11 @@ export class CreateRegisterDto {
   })
   password: string;
 
-  @IsArray()
-  @IsUUID(undefined, { each: true })
-  @ArrayMinSize(3, { message: 'Phải có tối thiểu 3 tag' })
-  tags: string[];
-
   @IsString()
   fullname: string;
+
+  @IsArray()
+  @IsUUID(undefined, { each: true })
+  @ArrayMinSize(1)
+  tags: string[];
 }

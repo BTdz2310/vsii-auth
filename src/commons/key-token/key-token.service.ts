@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'fs';
 import { join } from 'path';
+import { AuthResponse } from 'src/interfaces/AuthResponse.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,31 +13,24 @@ export class KeyTokenService {
   ) {}
 
   accessTokenDuration = '15m';
-  refreshTokenDuration = '1y';
+  refreshTokenDuration = '1m';
   jwtHeader = {
     algorithm: 'HS256',
     header: { typ: 'JWT' },
   };
 
-  getRefreshKey(): string {
-    const key = process.env.RF_KEY;
-    const keyPath = join(process.cwd(), 'keys', key);
-    return fs.readFileSync(keyPath, 'utf8');
-  }
-
-  getAccessKey(): string {
-    const key = process.env.AC_KEY;
+  getPrivateKey(): string {
+    const key = process.env.PRIVATE_KEY;
     const keyPath = join(process.cwd(), 'keys', key);
     return fs.readFileSync(keyPath, 'utf8');
   }
 
   // Token
   signToken(payload: any) {
-    const accessKey = this.getAccessKey();
-    const refreshKey = this.getRefreshKey();
+    const privateKey = this.getPrivateKey();
     const accessToken = this.jwt.sign(payload, {
       expiresIn: this.accessTokenDuration,
-      secret: accessKey,
+      secret: privateKey,
       header: {
         typ: 'JWT',
         alg: 'RS256',
@@ -44,7 +38,7 @@ export class KeyTokenService {
     });
     const refreshToken = this.jwt.sign(payload, {
       expiresIn: this.refreshTokenDuration,
-      secret: refreshKey,
+      secret: privateKey,
       header: {
         typ: 'JWT',
         alg: 'RS256',
@@ -56,19 +50,19 @@ export class KeyTokenService {
     };
   }
 
-  verifyAccessToken(token: string) {
-    const accessKey = this.getAccessKey();
-    return this.jwt.verify(token, {
-      publicKey: accessKey,
-    });
-  }
+  // verifyAccessToken(token: string) {
+  //   const accessKey = this.getAccessKey();
+  //   return this.jwt.verify(token, {
+  //     publicKey: accessKey,
+  //   });
+  // }
 
-  verifyRefreshToken(token: string) {
-    const refreshKey = this.getRefreshKey();
-    return this.jwt.verify(token, {
-      publicKey: refreshKey,
-    });
-  }
+  // verifyRefreshToken(token: string) {
+  //   const refreshKey = this.getRefreshKey();
+  //   return this.jwt.verify(token, {
+  //     publicKey: refreshKey,
+  //   });
+  // }
 
   // async exchangeToken(auth: AuthResponse) {
   //   const { privateKey, publicKey } = this.generateKeyPair();

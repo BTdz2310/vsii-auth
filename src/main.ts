@@ -15,13 +15,16 @@ async function bootstrap() {
           `${process.env.NODE_ENV === 'dev' ? 'localhost' : 'kafka'}:9092`,
           // 'localhost:9092',
         ],
+        retry: {
+          retries: 1,
+          multiplier: 1,
+        },
       },
       consumer: {
         groupId: 'auth-consumer',
       },
     },
   });
-
   await app.startAllMicroservices();
   await app.listen(3000);
 }
