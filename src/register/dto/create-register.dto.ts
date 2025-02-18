@@ -27,6 +27,6 @@ export class CreateRegisterDto {
 
   @IsArray()
   @IsUUID(undefined, { each: true })
-  @ArrayMinSize(1)
+  @ArrayMinSize(3)
   tags: string[];
 }

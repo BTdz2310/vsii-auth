@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'fs';
 import { join } from 'path';
-import { AuthResponse } from 'src/interfaces/AuthResponse.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -14,10 +13,10 @@ export class KeyTokenService {
 
   accessTokenDuration = '15m';
   refreshTokenDuration = '1m';
-  jwtHeader = {
-    algorithm: 'HS256',
-    header: { typ: 'JWT' },
-  };
+  // jwtHeader = {
+  //   algorithm: 'RS256',
+  //   header: { typ: 'JWT' },
+  // };
 
   getPrivateKey(): string {
     const key = process.env.PRIVATE_KEY;

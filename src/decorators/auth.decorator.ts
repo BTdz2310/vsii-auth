@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { AuthResponse } from 'src/interfaces/AuthResponse.interface';
+import { AuthResponse } from 'interfaces/AuthResponse.interface';
 
 export const Auth = createParamDecorator(
   (data: keyof AuthResponse | undefined, ctx: ExecutionContext) => {

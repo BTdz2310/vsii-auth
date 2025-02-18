@@ -1,7 +1,7 @@
 import { Controller, Get, Inject, Post, Res, UseGuards } from '@nestjs/common';
 import { LoginService } from './login.service';
 import { LocalGuard } from 'src/guards/local.guard';
-import { AuthResponse } from 'src/interfaces/AuthResponse.interface';
+import { AuthResponse } from 'interfaces/AuthResponse.interface';
 import { Auth } from 'src/decorators/auth.decorator';
 import type { Response } from 'express';
 import { KeyTokenService } from 'src/commons/key-token/key-token.service';
@@ -25,34 +25,36 @@ export class LoginController {
     auth: AuthResponse,
     response: Response,
   ) {
-    console.log('auauauau', auth);
-    const { accessToken, refreshToken } = this.keyTokenService.signToken(auth);
-    console.log('accessToken', accessToken);
-    console.log('refreshToken', refreshToken);
+    // console.log(auth)
     const user = await this.kafkaClient
       .send('auth.getUser', {
         authId: auth.id,
-        username: auth.username,
       })
       .toPromise();
-    // console.log('user', user);
-    response.cookie('Access_Token', accessToken, {
-      httpOnly: false,
-      sameSite: 'lax',
-      secure: false,
-      expires: new Date(Date.now() + 15 * 60 * 1000),
+    const { fullName, avatar } = user;
+    const { accessToken, refreshToken } = this.keyTokenService.signToken({
+      ...auth,
+      fullName,
+      avatar,
     });
-    response.cookie('Refresh_Token', refreshToken, {
+    // console.log('user', user);
+    // response.cookie('Access_Token', accessToken, {
+    //   httpOnly: false,
+    //   sameSite: 'lax',
+    //   secure: false,
+    //   expires: new Date(Date.now() + 15 * 60 * 1000),
+    // });
+    response.cookie('Refresh-Token', refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
       secure: false,
       expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
     });
-    // return response.status(200).json({
-    //   user,
-    //   accessToken,
-    // });
-    response.status(200).send(user);
+    const resp = {
+      user,
+      accessToken,
+    };
+    response.status(200).send(resp);
   }
 
   @Post('')
@@ -61,7 +63,7 @@ export class LoginController {
     @Auth() auth: AuthResponse,
     @Res({ passthrough: true }) response: Response,
   ) {
-    console.log('auth', auth);
+    // console.log('auth', auth);
     return this.handleAuthenticationResponse(auth, response);
   }
 
