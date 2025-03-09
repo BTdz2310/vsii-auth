@@ -11,8 +11,8 @@ export class KeyTokenService {
     private readonly prisma: PrismaService,
   ) {}
 
-  accessTokenDuration = '15m';
-  refreshTokenDuration = '1m';
+  accessTokenDuration = '1d';
+  refreshTokenDuration = '1y';
   // jwtHeader = {
   //   algorithm: 'RS256',
   //   header: { typ: 'JWT' },
